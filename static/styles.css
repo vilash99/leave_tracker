@@ -1,0 +1,43 @@
+body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+
+.container {
+  width: 350px;
+  margin: 2rem auto;
+  border: 1px solid #000;
+  padding: 1rem;
+  text-align: center;
+}
+
+
+.container .textbox {
+  height: 30px;
+  width: 100%;
+  border-radius: 20px;
+  padding: 5px;
+  outline: none;
+  border-color: #274551;
+}
+
+.btn {
+  padding: 15px 10px;
+  width: 100%;
+  background-color: #274551;
+  color: #fff;
+  border-radius: 40px;
+  outline: none;
+  border-color: #274551;
+  cursor: pointer;
+  transition: 0.5s ease-in;
+  opacity: 0.8;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.btn:hover {
+  opacity: 1;
+}
