@@ -4,8 +4,99 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Employee</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  <h1>Hello, {{ user.full_name }}</h1>
+  <div class="main-container">
+    {% if user %}
+      <p>Welcome, <span class="hero-text">{{ user.full_name }}!</span></p>
+      <a href="/logout">Logout</a>
+    {% else %}
+      <p>You are not logged in.</p>
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+    {% endif %}
+
+    <p>Total leaves allotted: {{ user.leaves_alloted}}</p>
+    <p>Total Leaves taken: {{ leaves_days.total_days_leaves}}</p>
+    <p>Remaining leaves: {{ leaves_days.balance_leaves}}</p>
+
+    <div class="leave-container">
+      <h3>Apply for leaves</h3>
+
+      <form action="" method="post">
+        <div class="input-fields">
+          <p>From date</p>
+          <p><input class="textbox" type="date" name="from-date"></p>
+        </div>
+
+        <div class="input-fields">
+          <p>Till date</p>
+          <p><input class="textbox" type="date" name="till-date"></p>
+        </div>
+
+        <div class="input-fields">
+          <p>Total days</p>
+          <p><input class="textbox" type="number" name="total-days"></p>
+        </div>
+
+        <div class="input-fields">
+          <p>Reason</p>
+          <p><input class="textbox" type="text" name="reason"></p>
+        </div>
+
+        <div class="input-fields">
+          <p>&nbsp;</p>
+          <p><input class="btn" type="submit" value="Apply"></p>
+        </div>
+      </form>
+    </div>
+
+    <table class="table">
+      <tr>
+        <th>From date</th>
+        <th>Till date</th>
+        <th>Total days</th>
+        <th>Reason</th>
+        <th>Approved?</th>
+        <th>Approved by</th>
+        <th>Comments</th>
+        <th>Action</th>
+      </tr>
+
+      {% if leaves %}
+        {% for leave in leaves %}
+          <tr>
+            <td>{{ leave.from_date }}</td>
+            <td>{{ leave.till_date }}</td>
+            <td>{{ leave.total_days }}</td>
+            <td>{{ leave.reason }}</td>
+            {% if leave.is_approved == -1 %}
+              <td>Pending</td>
+            {% elif leave.is_approved == 0 %}
+              <td>Not Approved</td>
+            {% else %}
+              <td>Approved</td>
+            {% endif %}
+
+            {% if leave.approved_by %}
+              <td>{{ leave.approved_by }}</td>
+            {% else %}
+              <td></td>
+            {% endif %}
+
+
+            {% if leave.comment %}
+              <td>{{ leave.approved_by }}</td>
+            {% else %}
+              <td></td>
+            {% endif %}
+
+            <td>&nbsp;</td>
+          </tr>
+        {% endfor %}
+      {% endif %}
+    </table>
+  </div>
 </body>
 </html>

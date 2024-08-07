@@ -14,13 +14,14 @@ body {
 }
 
 
-.container .textbox {
+.textbox {
   height: 30px;
   width: 100%;
   border-radius: 20px;
   padding: 5px;
   outline: none;
   border-color: #274551;
+  font-size: 1rem;
 }
 
 .btn {
@@ -40,4 +41,57 @@ body {
 
 .btn:hover {
   opacity: 1;
+}
+
+
+.main-container {
+  width: 1040px;
+  margin: 2rem auto;
+}
+
+.hero-text {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table tr th {
+  background-color: #274551;
+  color: #fff;
+}
+
+
+.table tr th,
+.table tr td {
+  padding: 5px 10px;
+  border: 1px solid #274551;
+}
+
+
+.leave-container form {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid #274551;
+  margin: 1rem 0;
+  padding: 1rem 0.5rem;
+}
+
+.leave-container .input-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.leave-container .input-fields p {
+  margin: 0;
+}
+
+.input-fields .btn {
+  padding: 5px 10px;
 }

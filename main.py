@@ -1,5 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, session, request
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
+
+from datetime import timedelta
 
 
 app = Flask(__name__)
@@ -8,6 +11,13 @@ app.secret_key = 'XlmfYVd5zq78lm9pzzD6x6jWBMNZIV4W'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:vilvic009@localhost/postgres'
 db = SQLAlchemy(app)
 
+app.config['SESSION_PERMANENT'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
 
 
 class Employee(db.Model):
@@ -20,6 +30,19 @@ class Employee(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
 
 
+class Leave(db.Model):
+    __tablename__ = 'leave'
+    id = db.Column(db.Integer, primary_key=True)
+    emp_id = db.Column(db.Integer, nullable=False)
+    from_date = db.Column(db.Date, nullable=False)
+    till_date = db.Column(db.Date, nullable=False)
+    total_days = db.Column(db.Integer, nullable=False)
+    reason = db.Column(db.Text)
+    is_approved = db.Column(db.Integer)
+    approved_by = db.Column(db.Integer)
+    comment = db.Column(db.Text)
+
+
 def get_current_user():
     if 'emp_id' in session:
         return Employee.query.filter_by(emp_id=session['emp_id']).first()
@@ -27,7 +50,7 @@ def get_current_user():
     return None
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def employee_home():
     user = get_current_user()
 
@@ -35,7 +58,34 @@ def employee_home():
         if user.is_admin:
             return redirect(url_for('admin_page'))
 
-        return render_template('employee_page.html', user=user)
+        if request.method == 'POST':
+            from_date = request.form['from-date']
+            till_date = request.form['till-date']
+            total_days = request.form['total-days']
+            reason = request.form['reason']
+
+            new_leave = Leave(emp_id=user.emp_id, from_date=from_date, till_date=till_date,
+                              total_days=total_days, reason=reason, is_approved=-1)
+            db.session.add(new_leave)
+            db.session.commit()
+
+            return redirect(url_for('employee_home'))
+
+
+        total_days_leaves = db.session.query(func.sum(Leave.total_days)).filter(Leave.emp_id == user.emp_id).scalar()
+        if not total_days_leaves:
+            total_days_leaves = 0
+
+        balance_leaves = user.leaves_alloted - total_days_leaves
+
+        leaves_days = {
+            'total_days_leaves': total_days_leaves,
+            'balance_leaves': balance_leaves
+        }
+
+        leaves = Leave.query.filter_by(emp_id=user.emp_id).all()
+
+        return render_template('employee_page.html', user=user, leaves_days=leaves_days, leaves=leaves)
 
     return redirect(url_for('login'))
 
@@ -43,7 +93,7 @@ def employee_home():
 
 @app.route('/admin')
 def admin_page():
-    return 'Admin Page'
+    return render_template('admin_page.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -82,17 +132,13 @@ def register():
 
     return render_template('register.html')
 
+
+@app.route('/logout')
+def logout():
+    session.pop('emp_id', None)
+    return redirect(url_for('employee_home'))
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
-
-
-# Home -> /
-
-# if login in Session :
-#     if admin:
-#         goto admin page
-#     else:
-#         goto employee page
-# else:
-#     login page
