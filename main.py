@@ -6,9 +6,12 @@ from datetime import timedelta
 
 
 app = Flask(__name__)
+
 app.secret_key = 'XlmfYVd5zq78lm9pzzD6x6jWBMNZIV4W'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:vilvic009@localhost/postgres'
+                                      # 'protocol://username:password@host/database_name'
+
 db = SQLAlchemy(app)
 
 app.config['SESSION_PERMANENT'] = True
@@ -48,6 +51,7 @@ def get_current_user():
         return Employee.query.filter_by(emp_id=session['emp_id']).first()
 
     return None
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -123,12 +127,13 @@ def register():
         username = request.form['username']
         password = request.form['password']
 
-        if not Employee.query.filter_by(username=username).first():
-            new_user = Employee(full_name=full_name, username=username, password=password)
-            db.session.add(new_user)
-            db.session.commit()
+        if full_name and username and password:
+            if not Employee.query.filter_by(username=username).first():
+                new_user = Employee(full_name=full_name, username=username, password=password)
+                db.session.add(new_user)
+                db.session.commit()
 
-            return redirect(url_for('login'))
+                return redirect(url_for('login'))
 
     return render_template('register.html')
 
